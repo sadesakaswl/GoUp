@@ -1,0 +1,2 @@
+# goup
+Go installer tool
