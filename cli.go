@@ -12,8 +12,9 @@ func initCLI() {
 		Version: "0.1",
 	}
 	installCmd := &cobra.Command{
-		Use:   "install",
-		Short: "Installs Go and GoUp",
+		Use:   "install [version]",
+		Short: "Installs Go and GoUp.",
+		Long:  "Installs Go and GoUp.\nDefault version: latest",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return install("latest")
@@ -43,9 +44,31 @@ func initCLI() {
 			return err
 		},
 	}
+	getCmd := &cobra.Command{
+		Use:   "get [version]",
+		Short: `Installs a version with "go get"`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return get("latest")
+			}
+			return get(args[0])
+		},
+	}
+	deleteCmd := &cobra.Command{
+		Use:   "delete [version]",
+		Short: `Deletes a version which installed with "goup get" or "go get"`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return delete("latest")
+			}
+			return delete(args[0])
+		},
+	}
 	rootCmd.AddCommand(installCmd)
 	rootCmd.AddCommand(uninstallCmd)
 	rootCmd.AddCommand(upgradeCmd)
 	rootCmd.AddCommand(checkCmd)
+	rootCmd.AddCommand(getCmd)
+	rootCmd.AddCommand(deleteCmd)
 	rootCmd.Execute()
 }

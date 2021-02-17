@@ -30,7 +30,12 @@ func install2Windows(version string) error {
 		if latest == 0 {
 			return nil
 		}
+		if latest == 1 {
+			uninstall()
+		}
 	}
+	pauseProgress(ch)
+	fmt.Printf("Installing - %s\n", version)
 	resp, err := http.Get(fmt.Sprintf("https://dl.google.com/go/%s.windows-%s.zip", version, runtime.GOARCH))
 	if err != nil {
 		closeProgress(ch)
@@ -102,7 +107,12 @@ func install2Unix(version string) error {
 		if latest == 0 {
 			return nil
 		}
+		if latest == 1 {
+			uninstall()
+		}
 	}
+	pauseProgress(ch)
+	fmt.Printf("Installing - %s\n", version)
 	resp, err := http.Get(fmt.Sprintf("https://dl.google.com/go/%s.%s-%s.tar.gz", version, runtime.GOOS, runtime.GOARCH))
 	if err != nil {
 		closeProgress(ch)

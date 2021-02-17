@@ -19,6 +19,7 @@ func uninstallWindows() error {
 	if err != nil {
 		return err
 	}
+	defer closeProgress(ch)
 	return removeGoUpDir()
 }
 func uninstallUnix() error {

@@ -24,6 +24,9 @@ func Progress(status <-chan string, reloadDuration time.Duration) {
 					ticker.Stop()
 					return
 				}
+				if operation == "Pause" {
+					operation = <-status
+				}
 				fmt.Printf(strings.Repeat(" ", len(fmt.Sprintf(progressText, operation, keys[i]))*2) + "\r")
 			}
 		}
@@ -35,4 +38,7 @@ func initProgress(duration time.Duration) (statusChan chan string, reloadDuratio
 }
 func closeProgress(statusChan chan<- string) {
 	statusChan <- "Exit"
+}
+func pauseProgress(statusChan chan<- string) {
+	statusChan <- "Pause"
 }
