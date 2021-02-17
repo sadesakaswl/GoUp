@@ -1,4 +1,4 @@
-module goup
+module github.com/sadesakaswl/goup
 
 go 1.15
 
