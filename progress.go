@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
+
+const progressText = "%s... %s"
 
 //Progress Gives info about process to user
 func Progress(status <-chan string, reloadDuration time.Duration) {
@@ -14,13 +17,14 @@ func Progress(status <-chan string, reloadDuration time.Duration) {
 		for i := 0; i < len(keys); i++ {
 			select {
 			case <-ticker.C:
-				fmt.Printf("%s... %s\r", operation, keys[i])
+				fmt.Printf(progressText+"\r", operation, keys[i])
 			case operation = <-status:
 				if operation == "Exit" {
-					fmt.Println()
+					fmt.Printf(strings.Repeat(" ", len(fmt.Sprintf(progressText, operation, keys[i]))*2) + "\r")
 					ticker.Stop()
 					return
 				}
+				fmt.Printf(strings.Repeat(" ", len(fmt.Sprintf(progressText, operation, keys[i]))*2) + "\r")
 			}
 		}
 	}

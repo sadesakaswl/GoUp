@@ -83,11 +83,8 @@ func install2Windows(version string) error {
 		targetFile.Close()
 	}
 	ch <- "Adding GoUp to Path Environment"
-	err = addPathWindows()
-	if err != nil {
-		closeProgress(ch)
-		return err
-	}
+	addPathWindows()
+	addGoPathWindows()
 	closeProgress(ch)
 	return installGoUp()
 }

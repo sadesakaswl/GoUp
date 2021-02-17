@@ -23,10 +23,14 @@ case ":${PATH}:" in
     *)
         export PATH="$HOME/go/bin:$PATH"
         ;;
-esac`
+esac
+export GOROOT="$HOME/.goup/go"
+export GOPATH="$HOME/go"
+`
 const profileLine = `source "$HOME/.goup/env"`
 const windowsPath = `%USERPROFILE%\.goup\go\bin;%USERPROFILE%\go\bin`
 const windowsGoPath = `%USERPROFILE%\go`
+const windowsGoRootPath = `%USERPROFILE%\.goup\go`
 
 func checkPathUnix() (bool, error) {
 	home, err := os.UserHomeDir()
@@ -93,12 +97,12 @@ func checkPathWindows() (bool, error) {
 	}
 	return bytes.Contains(path, []byte(windowsPath)), nil
 }
-func checkGoPathWindows() (bool, error) {
+func checkGoPathWindows() bool {
 	path, err := exec.Command("REG", "QUERY", `HKCU\Environment`, "/v", "GOPATH").Output()
 	if err != nil {
-		return false, err
+		return false
 	}
-	return bytes.Contains(path, []byte(windowsGoPath)), nil
+	return bytes.Contains(path, []byte(windowsGoPath))
 }
 func addPathWindows() error {
 	contains, err := checkPathWindows()
@@ -106,31 +110,27 @@ func addPathWindows() error {
 		return err
 	}
 	if contains {
-		return nil
+		if err := removeWindowsPath(); err != nil {
+			return err
+		}
 	}
 	path, err := getWindowsPath()
 	if err != nil {
 		return err
 	}
 	path = bytes.Join([][]byte{path, []byte(windowsPath)}, []byte(";"))
-	_, err = exec.Command("REG", "ADD", `HKCU\Environment`, "/v", "Path", "/t", "REG_EXPAND_SZ", "/d", string(path), "/f").Output()
-	if err != nil {
-		return err
-	}
+	exec.Command("REG", "ADD", `HKCU\Environment`, "/v", "Path", "/t", "REG_EXPAND_SZ", "/d", string(path), "/f").Output()
 	return nil
 }
 func addGoPathWindows() error {
-	contains, err := checkGoPathWindows()
-	if err != nil {
-		return err
-	}
+	contains := checkGoPathWindows()
 	if contains {
-		return nil
+		if err := removeWindowsGoPath(); err != nil {
+			return nil
+		}
 	}
-	_, err = exec.Command("REG", "ADD", `HKCU\Environment`, "/v", "GOPATH", "/t", "REG_EXPAND_SZ", "/d", windowsGoPath, "/f").Output()
-	if err != nil {
-		return err
-	}
+	exec.Command("REG", "ADD", `HKCU\Environment`, "/v", "GOPATH", "/t", "REG_EXPAND_SZ", "/d", windowsGoPath, "/f").Output()
+	exec.Command("REG", "ADD", `HKCU\Environment`, "/v", "GOROOT", "/t", "REG_EXPAND_SZ", "/d", windowsGoRootPath, "/f").Output()
 	return nil
 }
 func getWindowsPath() ([]byte, error) {
@@ -161,10 +161,8 @@ func removeWindowsPath() error {
 	return nil
 }
 func removeWindowsGoPath() error {
-	_, err := exec.Command("REG", "DELETE", "HKCU\\Environment", "/v", "GOPATH", "/f").Output()
-	if err != nil {
-		return err
-	}
+	exec.Command("REG", "DELETE", "HKCU\\Environment", "/v", "GOPATH", "/f").Output()
+	exec.Command("REG", "DELETE", "HKCU\\Environment", "/v", "GOROOT", "/f").Output()
 	return nil
 }
 func chmodUnix() error {
