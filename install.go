@@ -21,9 +21,15 @@ func install2Windows(version string) error {
 	go Progress(ch, dur)
 	ch <- "Fetching"
 	version, err := versionCheck(version)
-	if err != nil {
-		closeProgress(ch)
-		return err
+	path, _ := exec.LookPath("go")
+	if path != "" {
+		latest, err := check()
+		if err != nil {
+			return err
+		}
+		if latest == 0 {
+			return nil
+		}
 	}
 	resp, err := http.Get(fmt.Sprintf("https://dl.google.com/go/%s.windows-%s.zip", version, runtime.GOARCH))
 	if err != nil {
@@ -64,7 +70,6 @@ func install2Windows(version string) error {
 			return err
 		}
 		defer fileReader.Close()
-
 		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, zipFile.Mode())
 		if err != nil {
 			closeProgress(ch)
@@ -91,16 +96,22 @@ func install2Unix(version string) error {
 	go Progress(ch, dur)
 	ch <- "Fetching"
 	version, err := versionCheck(version)
-	if err != nil {
-		closeProgress(ch)
-		return err
+	path, _ := exec.LookPath("go")
+	if path != "" {
+		latest, err := check()
+		if err != nil {
+			return err
+		}
+		if latest == 0 {
+			return nil
+		}
 	}
 	resp, err := http.Get(fmt.Sprintf("https://dl.google.com/go/%s.%s-%s.tar.gz", version, runtime.GOOS, runtime.GOARCH))
 	if err != nil {
 		closeProgress(ch)
 		return err
 	}
-	ch <- "Downloading"
+	ch <- "Downloading and Extracting"
 	defer resp.Body.Close()
 	gzReader, err := gzip.NewReader(resp.Body)
 	if err != nil {
@@ -126,7 +137,7 @@ func install2Unix(version string) error {
 		}
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err := os.Mkdir(filepath.Join(home, ".goup", header.Name), 0755); err != nil {
+			if err := os.MkdirAll(filepath.Join(home, ".goup", header.Name), 0755); err != nil {
 				closeProgress(ch)
 				return err
 			}
@@ -147,7 +158,17 @@ func install2Unix(version string) error {
 		}
 	}
 	ch <- "Adding GoUp to Path Environment"
+	err = writeEnvFile()
+	if err != nil {
+		closeProgress(ch)
+		return err
+	}
 	err = addPathUnix()
+	if err != nil {
+		closeProgress(ch)
+		return err
+	}
+	err = chmodUnix()
 	if err != nil {
 		closeProgress(ch)
 		return err

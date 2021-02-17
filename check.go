@@ -51,25 +51,26 @@ func getInstalledVersion() (string, error) {
 	version := bytes.Fields(versionArray)[2]
 	return string(version), nil
 }
-func check() error {
+func check() (int, error) {
 	latest, err := getLatestVersion()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	installed, err := getInstalledVersion()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if latest == installed {
 		fmt.Println("Go is already up to date")
+		return 0, nil
 	} else if strings.Compare(latest, installed) == 1 {
 		fmt.Printf("Go is not up to date - %s\n", installed)
 		fmt.Printf("Latest version - %s\n", latest)
-		fmt.Printf("For update: %s update\n", os.Args[0])
-	} else {
-		fmt.Printf("Beta version found - %s\n", installed)
-		fmt.Printf("To switch latest channel: %s update\n", os.Args[0])
-		fmt.Printf("To get other beta version: %s install [VERSION]\n", os.Args[0])
+		fmt.Printf("For upgrade: %s upgrade\n", os.Args[0])
+		return 1, nil
 	}
-	return nil
+	fmt.Printf("Beta version found - %s\n", installed)
+	fmt.Printf("To switch latest channel: %s update\n", os.Args[0])
+	fmt.Printf("To get other beta version: %s install [VERSION]\n", os.Args[0])
+	return -1, nil
 }

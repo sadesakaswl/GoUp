@@ -167,3 +167,22 @@ func removeWindowsGoPath() error {
 	}
 	return nil
 }
+func chmodUnix() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	filepath.Walk(filepath.Join(home, ".goup"), func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		return os.Chmod(path, 0777)
+	})
+	filepath.Walk(filepath.Join(home, "go"), func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		return os.Chmod(path, 0777)
+	})
+	return nil
+}

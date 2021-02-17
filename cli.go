@@ -39,7 +39,8 @@ func initCLI() {
 		Use:   "check",
 		Short: "Checks for latest version of Go",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return check()
+			_, err := check()
+			return err
 		},
 	}
 	rootCmd.AddCommand(installCmd)
