@@ -4,7 +4,7 @@
 ### Get binary
 For Windows
 ```bash
-go get -u github.com/sadesakaswl/goup & move %USERPROFILE%\\go\\bin\\goup.exe %USERPROFILE%
+go get -u github.com/sadesakaswl/goup & move %USERPROFILE%\go\bin\goup.exe %USERPROFILE%
 ```
 For Unix
 ```bash
@@ -15,7 +15,7 @@ Uninstall current Go installation
 ### Install with GoUp
 For Windows
 ```bash
-%USERPROFILE%\\goup install
+%USERPROFILE%\goup install
 ```
 For Unix
 ```bash
