@@ -30,9 +30,9 @@ func install2Windows(version string) error {
 		if latestVersion, _ := getLatestVersion(); latestVersion == version && latest == 0 {
 			return nil
 		}
-		if latest == 1 {
-			uninstall()
-		}
+		installed, _ := getInstalledVersion()
+		ch <- fmt.Sprintf("Uninstalling - %s\n", installed)
+		uninstall()
 	}
 	pauseProgress(ch)
 	fmt.Printf("Installing - %s\n", version)
@@ -90,7 +90,8 @@ func install2Windows(version string) error {
 	ch <- "Adding GoUp to Path Environment"
 	addPathWindows()
 	addGoPathWindows()
-	closeProgress(ch)
+	ch <- "Installing GoUp"
+	defer closeProgress(ch)
 	return installGoUp()
 }
 func install2Unix(version string) error {
@@ -107,9 +108,9 @@ func install2Unix(version string) error {
 		if latestVersion, _ := getLatestVersion(); latestVersion == version && latest == 0 {
 			return nil
 		}
-		if latest == 1 {
-			uninstall()
-		}
+		installed, _ := getInstalledVersion()
+		ch <- fmt.Sprintf("Uninstalling - %s", installed)
+		uninstall()
 	}
 	pauseProgress(ch)
 	fmt.Printf("Installing - %s\n", version)
@@ -180,7 +181,8 @@ func install2Unix(version string) error {
 		closeProgress(ch)
 		return err
 	}
-	closeProgress(ch)
+	ch <- "Installing GoUp"
+	defer closeProgress(ch)
 	return installGoUp()
 }
 func install(version string) error {
