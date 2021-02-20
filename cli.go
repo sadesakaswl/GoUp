@@ -2,10 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/spf13/cobra"
 )
+
+var getCmd *cobra.Command
 
 func initCLI() {
 	rootCmd := &cobra.Command{
@@ -47,9 +52,10 @@ func initCLI() {
 			return err
 		},
 	}
-	getCmd := &cobra.Command{
+	getCmd = &cobra.Command{
 		Use:   "get [version]",
 		Short: `Installs a version with "go get"`,
+		Long:  `Installs a version with "go get"` + "\nDefault : latest",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return get("latest")
@@ -58,8 +64,9 @@ func initCLI() {
 		},
 	}
 	deleteCmd := &cobra.Command{
-		Use:   "delete [version]",
+		Use:   "delete [version/all]",
 		Short: `Deletes a version which installed with "goup get" or "go get"`,
+		Long:  `Deletes a version which installed with "goup get" or "go get"` + "\nDefault : latest",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				return delete("latest")
@@ -67,6 +74,11 @@ func initCLI() {
 			return delete(args[0])
 		},
 	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	getCmd.PersistentFlags().BoolP("download", "d", false, fmt.Sprintf("Download to %s", filepath.Join(home, "sdk")))
 	rootCmd.AddCommand(installCmd)
 	rootCmd.AddCommand(uninstallCmd)
 	rootCmd.AddCommand(upgradeCmd)

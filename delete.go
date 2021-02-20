@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -32,6 +33,7 @@ func delete(version string) error {
 			if err = os.Remove(filepath.Join(home, "go", "bin", v.Name()+extension)); err != nil {
 				return err
 			}
+			fmt.Printf("Deleted %s\n", v.Name())
 		}
 		return nil
 	}
@@ -39,5 +41,6 @@ func delete(version string) error {
 	if err = os.Remove(filepath.Join(home, "go", "bin", version+extension)); err != nil {
 		return err
 	}
+	fmt.Printf("Deleted %s\n", version)
 	return nil
 }
