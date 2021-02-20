@@ -36,6 +36,8 @@ func versionCheck(text string) (string, error) {
 			return "", err
 		}
 		return version, nil
+	} else if text == "all" { //For goup delete
+		return "all", nil
 	}
 	if !strings.Contains(text, "go") {
 		return strings.Join([]string{"go", text}, ""), nil

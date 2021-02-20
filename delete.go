@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -21,5 +22,22 @@ func delete(version string) error {
 	} else {
 		extension = ""
 	}
-	return os.Remove(filepath.Join(home, "go", "bin", version+extension))
+	if version == "all" {
+		directories, err := ioutil.ReadDir(filepath.Join(home, "sdk"))
+		if err != nil {
+			return err
+		}
+		os.RemoveAll(filepath.Join(home, "sdk"))
+		for _, v := range directories {
+			if err = os.Remove(filepath.Join(home, "go", "bin", v.Name()+extension)); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	os.RemoveAll(filepath.Join(home, "sdk", version))
+	if err = os.Remove(filepath.Join(home, "go", "bin", version+extension)); err != nil {
+		return err
+	}
+	return nil
 }
