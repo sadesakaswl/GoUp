@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"runtime"
+
 	"github.com/spf13/cobra"
 )
 
@@ -9,7 +12,7 @@ func initCLI() {
 		Use:     "goup",
 		Short:   "GoUp is a install and upgrade tool",
 		Long:    "GoUp provides installing and upgrading basically!\nhttps://github.com/sadesakaswl/GoUp",
-		Version: "0.1",
+		Version: fmt.Sprintf("0.1\nGo version - %s", runtime.Version()),
 	}
 	installCmd := &cobra.Command{
 		Use:   "install [version]",
