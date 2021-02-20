@@ -27,7 +27,7 @@ func install2Windows(version string) error {
 		if err != nil {
 			return err
 		}
-		if latest == 0 {
+		if latestVersion, _ := getLatestVersion(); latestVersion == version && latest == 0 {
 			return nil
 		}
 		if latest == 1 {
@@ -104,7 +104,7 @@ func install2Unix(version string) error {
 		if err != nil {
 			return err
 		}
-		if latest == 0 {
+		if latestVersion, _ := getLatestVersion(); latestVersion == version && latest == 0 {
 			return nil
 		}
 		if latest == 1 {
